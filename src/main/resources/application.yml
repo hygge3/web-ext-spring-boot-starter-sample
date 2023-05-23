@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/sample
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: 127.0.0.1
+      password:
+ext:
+  cookie:
+    secure: off
+    same-site: lax
+  log:
+    enabled: true
+    request: true
+    trace: true
+  redis:
+    redis-serializer: fastjson
+  auth:
+    user-key: id
