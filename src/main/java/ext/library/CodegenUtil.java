@@ -7,13 +7,10 @@ import java.util.Set;
 
 public class CodegenUtil {
     public static void main(String[] args) {
-        GenerateConfig generateConfig = new GenerateConfig();
-        generateConfig.setJdbcUrl("jdbc:mysql://127.0.0.1:3306/sample");
-        generateConfig.setUsername("root");
-        generateConfig.setPassword("123456");
-        generateConfig.setBasePackage("ext.library");
-        generateConfig.setGenerateTables(Set.of("user"));
+        GenerateConfig generateConfig = new GenerateConfig("jdbc:mysql://rm-j6c5ac872mg26lc86co.mysql.rds.aliyuncs.com/sample", "developer", "aPrJ5xNQbs&um", "ext.library", Set.of("t_user"));
+        generateConfig.setTablePrefix("t_");
         generateConfig.setLargeColumns(Set.of("remark"));
+        generateConfig.setAddCacheExample(true);
         Codegen.generate(generateConfig);
     }
 }

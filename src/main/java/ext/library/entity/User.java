@@ -4,11 +4,30 @@ import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
+import ext.library.entity.enums.UserGender;
 import ext.library.mybatis.entity.BaseEntity;
+import ext.library.vo.UserVO;
+import io.github.linpeilie.annotations.AutoMapper;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-
-@Table(value = "user")
+/**
+ * 实体类。
+ *
+ * @author Mybatis-Flex Codegen
+ * @since 2023-07-11
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(value = "t_user")
+@AutoMapper(target = UserVO.class)
 public class User extends BaseEntity {
 
     /**
@@ -18,14 +37,24 @@ public class User extends BaseEntity {
     private Long id;
 
     /**
-     * 用户名
+     * 名称
      */
-    private String username;
+    private String name;
 
     /**
-     * 密码
+     * 性别 1 男 2 女
      */
-    private String password;
+    private UserGender gender;
+
+    /**
+     * 出生日期
+     */
+    private LocalDate birthDate;
+
+    /**
+     * 电话
+     */
+    private String phone;
 
     /**
      * 备注
@@ -34,76 +63,21 @@ public class User extends BaseEntity {
     private String remark;
 
     /**
-     * 创建时间
+     * 创建日期
      */
     @Column(onInsertValue = "now()")
     private LocalDateTime createTime;
 
     /**
-     * 更新时间
+     * 修改日期
      */
+    @Column(onUpdateValue = "now()")
     private LocalDateTime updateTime;
 
     /**
-     * 删除标识
+     * 删除日期
      */
     @Column(isLogicDelete = true)
-    private Integer isDeleted;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
-    }
-
-    public LocalDateTime getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(LocalDateTime updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public Integer getIsDeleted() {
-        return isDeleted;
-    }
-
-    public void setIsDeleted(Integer isDeleted) {
-        this.isDeleted = isDeleted;
-    }
+    private LocalDateTime deleteTime;
 
 }

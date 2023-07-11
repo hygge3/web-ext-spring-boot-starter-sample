@@ -20,6 +20,8 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <ext.version>1.0.0</ext.version>
+        <mapstruct-plus.version>1.3.5</mapstruct-plus.version>
+        <smart-doc.version>2.7.1</smart-doc.version>
     </properties>
     <dependencies>
         <dependency>
@@ -40,10 +42,140 @@
     </dependencies>
 
     <build>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
+            <plugin>
+                <groupId>com.github.shalousun</groupId>
+                <artifactId>smart-doc-maven-plugin</artifactId>
+                <version>${smart-doc.version}</version>
+                <configuration>
+                    <!--指定生成文档的使用的配置文件,配置文件放在自己的项目中-->
+                    <configFile>./src/main/resources/smart-doc.json</configFile>
+                    <!--指定项目名称-->
+                    <projectName>远恒 CMS</projectName>
+                    <!--smart-doc实现自动分析依赖树加载第三方依赖的源码，如果一些框架依赖库加载不到导致报错，这时请使用excludes排除掉-->
+                    <excludes>
+                        <!--格式为：groupId:artifactId;参考如下-->
+                        <!--也可以支持正则式如：com.alibaba:.* -->
+                        <!--                        <exclude>com.alibaba:fastjson</exclude>-->
+                    </excludes>
+                    <!--includes配置用于配置加载外部依赖源码,配置后插件会按照配置项加载外部源代码而不是自动加载所有，因此使用时需要注意-->
+                    <!--smart-doc能自动分析依赖树加载所有依赖源码，原则上会影响文档构建效率，因此你可以使用includes来让插件加载你配置的组件-->
+                    <includes>
+                        <!--格式为：groupId:artifactId;参考如下-->
+                        <!--也可以支持正则式如：com.alibaba:.* -->
+                        <!-- 使用了mybatis-plus的Page分页需要include所使用的源码包 -->
+                        <!--                        <include>com.baomidou:mybatis-plus-extension</include>-->
+                        <!-- 使用了mybatis-plus的IPage分页需要include mybatis-plus-core-->
+                        <!--                        <include>com.baomidou:mybatis-plus-core</include>-->
+                        <!-- 如果配置了includes的情况下， 使用了jpa的分页需要include所使用的源码包 -->
+                        <include>org.springframework.data:spring-data-commons</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <!--如果不需要在执行编译时启动smart-doc，则将phase注释掉-->
+                        <phase>compile</phase>
+                        <goals>
+                            <!--smart-doc提供了html、openapi、markdown等goal，可按需配置-->
+                            <goal>html</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>io.github.linpeilie</groupId>
+                            <artifactId>mapstruct-plus-processor</artifactId>
+                            <version>${mapstruct-plus.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.2.0</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <compilerArgs>
+                        <arg>-Amapstruct.plus.unmappedSourcePolicy=WARN</arg>
+                        <arg>-Amapstruct.plus.unmappedTargetPolicy=WARN</arg>
+                        <arg>-Amapstruct.plus.builder.disableBuilder=false</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <!-- 打JAR包，不包含依赖文件；显式剔除配置文件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <archive>
+                        <!-- 生成的jar中，包含pom.xml和pom.properties这两个文件 -->
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                        <!-- 生成MANIFEST.MF的设置 -->
+                        <manifest>
+                            <!--这个属性特别关键，如果没有这个属性，有时候我们引用的包maven库 下面可能会有多个包，并且只有一个是正确的， 其余的可能是带时间戳的，此时会在classpath下面把那个带时间戳的给添加上去，然后我们 在依赖打包的时候， 打的是正确的，所以两头会对不上，报错。 -->
+                            <useUniqueVersions>false</useUniqueVersions>
+                            <!-- 为依赖包添加路径, 这些路径会写在MANIFEST文件的Class-Path下 -->
+                            <addClasspath>true</addClasspath>
+                            <!-- MANIFEST.MF 中 Class-Path 各个依赖加入前缀 -->
+                            <!--这个jar所依赖的jar包添加classPath的时候的前缀，需要 下面maven-dependency-plugin插件补充-->
+                            <!--一定要找对目录，否则jar找不到依赖lib，前边加../是因为jar在bin下，而bin与lib是平级目录-->
+                            <classpathPrefix>./lib</classpathPrefix>
+                            <!--指定jar启动入口类 -->
+                            <mainClass>ext.library.WebExtSampleApplication</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-lib</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/lib</outputDirectory>
+                            <includeScope>runtime</includeScope>
+                            <silent>true</silent>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <layout>ZIP</layout>
+                    <includes>
+                        <!-- 项目启动jar包中排除依赖包 -->
+                        <include>
+                            <groupId>non-exists</groupId>
+                            <artifactId>non-exists</artifactId>
+                        </include>
+                    </includes>
+                </configuration>
             </plugin>
         </plugins>
     </build>

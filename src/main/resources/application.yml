@@ -7,16 +7,22 @@ spring:
   data:
     redis:
       host: 127.0.0.1
-      password:
 ext:
   cookie:
     secure: off
     same-site: lax
-  log:
-    enabled: true
-    request: true
-    trace: true
+  web:
+    log:
+      enabled: true
+      request: true
+      trace: true
   redis:
     redis-serializer: fastjson
   auth:
     user-key: id
+  mybatis:
+    log: true
+mybatis-flex:
+  global-config:
+    deleted-value-of-logic-delete: NOW()
+    normal-value-of-logic-delete: null

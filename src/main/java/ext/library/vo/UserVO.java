@@ -1,47 +1,59 @@
 package ext.library.vo;
 
-import ext.library.ipo.ValidationGroups;
 import ext.library.mybatis.entity.BaseEntity;
+import ext.library.validation.annotation.Cellphone;
+import ext.library.validation.annotation.EnumCode;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 /**
  * 用户
  */
 @Data
 public class UserVO extends BaseEntity {
+
     /**
      * 主键
      */
-    @NotNull(groups = ValidationGroups.Update.class) @Null(groups = ValidationGroups.Create.class) Long id;
+    private Long id;
 
     /**
-     * 用户名
+     * 名称
      */
-
-    @NotNull(groups = ValidationGroups.Create.class) String username;
+    @NotBlank
+    private String name;
 
     /**
-     * 密码
+     * 性别 1 男 2 女
      */
-    @NotNull(groups = ValidationGroups.Create.class) String password;
+    @EnumCode({1, 2})
+    private Integer gender;
+
+    /**
+     * 性别 1 男 2 女
+     */
+    private String genderDesc;
+
+    /**
+     * 出生日期
+     */
+    @Past
+    @NotNull
+    private LocalDate birthDate;
+
+    /**
+     * 电话
+     */
+    @Cellphone
+    private String phone;
 
     /**
      * 备注
      */
-    String remark;
-
-    /**
-     * 创建时间
-     */
-    LocalDateTime createTime;
-
-    /**
-     * 更新时间
-     */
-    LocalDateTime updateTime;
+    private String remark;
 
 }

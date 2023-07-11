@@ -1,68 +1,103 @@
 package ext.library.controller;
 
 import com.mybatisflex.core.paginate.Page;
-import com.mybatisflex.core.query.QueryWrapper;
 import ext.library.entity.User;
 import ext.library.service.UserService;
-import ext.library.util.StringUtils;
+import ext.library.util.BeanUtils;
 import ext.library.vo.UserVO;
 import ext.library.web.view.PageResult;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
-import static ext.library.entity.tables.UserDef.user;
+import java.io.Serializable;
+import java.util.List;
 
+/**
+ * 控制层。
+ *
+ * @author Mybatis-Flex Codegen
+ * @since 2023-07-11
+ */
+@Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("users")
 public class UserController {
-    final UserService userService;
 
+    private final UserService userService;
 
-    @GetMapping
-    public PageResult<UserVO> page(@RequestParam Integer pageNum, @RequestParam Integer pageSize, @RequestParam(required = false) String username) {
-        QueryWrapper wrapper = QueryWrapper.create();
-        if (StringUtils.isNotBlank(username)) {
-            wrapper.and(user.username.like(username));
-        }
-        Page<User> page = Page.of(pageNum, pageSize);
-        Page<User> userPage = userService.page(page, wrapper);
-        return PageResult.of(userPage).convert(UserVO.class);
-    }
-
-    @GetMapping("{userId}")
-    public UserVO detail(@PathVariable Integer userId) {
-        User user = userService.getById(userId);
-        return user.convert(UserVO.class);
-    }
-
-    @PutMapping
-    public Long save(@RequestBody UserVO userVO) {
+    /**
+     * 添加。
+     *
+     * @param userVO 使用者视图对象
+     * @return {@link Long}
+     */
+    @PostMapping
+    public Long save(@RequestBody @Validated UserVO userVO) {
         User user = userVO.convert(User.class);
         userService.save(user);
         return user.getId();
     }
 
-    @PostMapping("{userId}")
-    public Long update(@PathVariable Long userId, @RequestBody UserVO userVO) {
-        User user = userVO.convert(User.class);
-        user.setId(userId);
-        userService.updateById(user);
-        return user.getId();
+    /**
+     * 根据主键删除。
+     *
+     * @param id 主键
+     * @return {@code true} 删除成功，{@code false} 删除失败
+     */
+    @DeleteMapping("{id}")
+    public Long remove(@PathVariable Long id) {
+        userService.removeById(id);
+        return id;
     }
 
-    @DeleteMapping("{userId}")
-    public Long delete(@PathVariable Long userId) {
-        userService.removeById(userId);
-        return userId;
+    /**
+     * 根据主键更新。
+     *
+     * @param id     id
+     * @param userVO 使用者视图对象
+     * @return {@link Long}
+     */
+    @PutMapping("{id}")
+    public Long update(@PathVariable Long id, @RequestBody UserVO userVO) {
+        User user = userVO.convert(User.class);
+        user.setId(id);
+        userService.updateById(user);
+        return id;
+    }
+
+    /**
+     * 查询所有。
+     *
+     * @return 所有数据
+     */
+    @GetMapping
+    public List<UserVO> list() {
+        return BeanUtils.convert(userService.list(), UserVO.class);
+    }
+
+    /**
+     * 根据主键获取详细信息。
+     *
+     * @param id 主键
+     * @return 详情
+     */
+    @GetMapping("{id}")
+    public UserVO getInfo(@PathVariable Serializable id) {
+        return userService.getById(id).convert(UserVO.class);
+    }
+
+    /**
+     * 分页查询。
+     *
+     * @param page 分页对象
+     * @return 分页对象
+     */
+    @GetMapping("page")
+    public PageResult<UserVO> page(PageResult<User> page) {
+        Page<User> paged = userService.page(page.toPage());
+        return PageResult.of(paged).convert(UserVO.class);
     }
 
 }
