@@ -1,3 +1,47 @@
 {
-  "outPath": "./src/main/resources/static/doc"
+  "outPath": "./src/main/resources/static/doc",
+  "isStrict": true,
+  "allInOne": true,
+  "randomMock": false,
+  "coverOld": true,
+  "createDebugPage": true,
+  "packageFilters": "ext.library.controller.*",
+  "style": "xt256",
+  "framework": "spring",
+  "sortByTitle": true,
+  "showAuthor": true,
+  "inlineEnum": true,
+  "recursionLimit": 5,
+  "requestExample": false,
+  "responseExample": false,
+  "requestParamsTable": true,
+  "responseParamsTable": true,
+  "displayActualType": true,
+  "isReplace": true,
+  "debugEnvName": "测试环境",
+  "tornaDebug": true,
+  "ignoreRequestParams": [
+    "org.springframework.ui.ModelMap"
+  ],
+  "dataDictionaries": [
+    {
+      "title": "用户性别字典",
+      "enumClassName": "ext.library.entity.enums.UserGender",
+      "codeField": "code",
+      "descField": "desc"
+    }
+  ],
+  "requestHeaders": [
+    {
+      "name": "token",
+      "type": "string",
+      "desc": "登录认证标识",
+      "required": false,
+      "since": "1.0",
+      "pathPatterns": "/**"
+    }
+  ],
+  "responseBodyAdvice": {
+    "className": "ext.library.web.view.Result"
+  }
 }

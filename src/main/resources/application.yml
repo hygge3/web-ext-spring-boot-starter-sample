@@ -7,6 +7,9 @@ spring:
   data:
     redis:
       host: 127.0.0.1
+  web:
+    resources:
+      add-mappings: true
 ext:
   cookie:
     secure: off
