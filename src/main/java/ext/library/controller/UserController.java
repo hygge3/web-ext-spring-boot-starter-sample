@@ -14,9 +14,9 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 控制层。
+ * 用户控制器
  *
- * @author Mybatis-Flex Codegen
+ * @author hygge
  * @since 2023-07-11
  */
 @Validated
@@ -28,9 +28,9 @@ public class UserController {
     private final UserService userService;
 
     /**
-     * 添加。
+     * 添加用户
      *
-     * @param userVO 使用者视图对象
+     * @param userVO 用户视图对象
      * @return {@link Long}
      */
     @PostMapping
@@ -41,7 +41,7 @@ public class UserController {
     }
 
     /**
-     * 根据主键删除。
+     * 删除用户
      *
      * @param id 主键
      * @return {@code true} 删除成功，{@code false} 删除失败
@@ -53,7 +53,7 @@ public class UserController {
     }
 
     /**
-     * 根据主键更新。
+     * 更新用户
      *
      * @param id     id
      * @param userVO 使用者视图对象
@@ -78,7 +78,7 @@ public class UserController {
     }
 
     /**
-     * 根据主键获取详细信息。
+     * 用户详情。
      *
      * @param id 主键
      * @return 详情
